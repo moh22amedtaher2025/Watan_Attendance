@@ -16,30 +16,35 @@ def init_clean_db():
     # تفعيل قيود المفاتيح الخارجية
     cursor.execute("PRAGMA foreign_keys = ON;")
     
-    # 1. إنشاء جدول الموظفين
+    # 1. إنشاء جدول الموظفين (أضفنا كل الأعمدة التي تطلبها ملفاتك الأخرى)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS employees (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        finger_id INTEGER PRIMARY KEY, -- العمود الرئيسي للبصمة
+        employee_id INTEGER,           -- عمود إضافي لضمان عمل بعض الشاشات
         name TEXT NOT NULL,
-        finger_id INTEGER UNIQUE,
-        active INTEGER DEFAULT 1
+        privilege INTEGER DEFAULT 0,
+        password TEXT,
+        department TEXT,
+        active INTEGER DEFAULT 1       -- مهم لعمل التقارير
     )""")
     
-    # 2. إنشاء جدول الحضور (معدل)
+    # 2. إنشاء جدول الحضور (أضفنا finger_id و employee_id معاً)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS attendance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        finger_id INTEGER,
         employee_id INTEGER,
         date TEXT,
-        check_in TEXT,
+        time TEXT,      -- لملف سحب البصمة
+        check_in TEXT,  -- لفترات الدوام
         check_out TEXT,
         check_in_2 TEXT, 
         check_out_2 TEXT,
-        UNIQUE(employee_id, date),
-        FOREIGN KEY(employee_id) REFERENCES employees(finger_id) ON DELETE CASCADE
+        status TEXT,
+        FOREIGN KEY(finger_id) REFERENCES employees(finger_id) ON DELETE CASCADE
     )""")
 
-    # 3. إنشاء جدول الإجازات الرسمية (ليعمل مع نظام التقارير)
+    # 3. إنشاء جدول الإجازات
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS holidays (
         holiday_date DATE UNIQUE
@@ -47,7 +52,7 @@ def init_clean_db():
     
     conn.commit()
     conn.close()
-    print(f"✅ تم إنشاء وتجهيز قاعدة البيانات بنجاح في:\n{db_path}")
+    print(f"✅ تم بناء القاعدة الشاملة بنجاح!")
 
 if __name__ == "__main__":
     init_clean_db()
