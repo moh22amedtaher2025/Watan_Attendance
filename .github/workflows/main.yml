@@ -2,7 +2,7 @@ name: Build_Watan_Attendance_System
 
 on:
   push:
-    branches: [ main ] # سيتم التحزيم تلقائياً عند رفع الكود لفرع main
+    branches: [ main ]
 
 jobs:
   build:
@@ -10,22 +10,22 @@ jobs:
 
     steps:
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python 3.11
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # تثبيت المكتبات بناءً على القائمة التي أرسلتِها
-        pip install PyQt5==5.15.11 pandas==3.0.1 numpy==2.4.2 zk==0.9.4 pyinstaller==6.19.0 openpyxl
+        # تثبيت المكتبات بناءً على القائمة الخاصة بك
+        pip install PyQt5==5.15.11 pandas==3.0.1 numpy==2.4.2 zk==0.9.4 pyinstaller==6.19.0 openpyxl pyodbc
 
     - name: Build EXE with PyInstaller
       run: |
-        # التحزيم في ملف واحد مع إضافة الصور والستايل
+        # تحزيم البرنامج مع إضافة الملفات المساعدة (تأكدي من وجودها في المستودع)
         pyinstaller --noconfirm --onefile --windowed `
         --icon="icon.ico" `
         --add-data "logo.jpg;." `
@@ -35,7 +35,7 @@ jobs:
         --name "WatanAttendance_Final" main.py
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Final_Program_EXE
         path: dist/WatanAttendance_Final.exe
